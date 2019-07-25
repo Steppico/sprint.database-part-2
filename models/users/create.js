@@ -10,7 +10,6 @@ module.exports = (knex, User) => {
         new Error("Username must be provided, and be at least two characters")
       );
     }
-
     return knex("users")
       .insert({ username: username.toLowerCase() })
       .then(() => {
@@ -18,7 +17,9 @@ module.exports = (knex, User) => {
           .where({ username: username.toLowerCase() })
           .select();
       })
-      .then((users) => new User(users.pop())) // create a user model out of the plain database response
+      .then((users) => {
+        return new User(users.pop());
+      }) // create a user model out of the plain database response
       .catch((err) => {
         // sanitize known errors
         if (

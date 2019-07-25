@@ -2,7 +2,7 @@
 const { expect, assert } = require("chai");
 const config = require("../config");
 const knex = require("knex")(config.db);
-const models = require("../models")(config);
+const models = require("../models")(knex);
 
 const forcePromiseReject = () => {
   throw new Error("This promise should have failed, but did not.");
@@ -174,7 +174,7 @@ describe("channel_messages", () => {
       .then(() => knex("users").del())
   );
 
-  describe("#create", () => {
+  describe.only("#create", () => {
     after(() => knex("channel_messages").del());
 
     it("creates a message", () =>
