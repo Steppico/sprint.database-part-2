@@ -1,29 +1,28 @@
 module.exports = (knex, channelMessage) => (params) =>
-  Promise.resolve(params).then((params) => {
-    console.log("checkmeoutyo", params);
-    return knex("channel_messages")
-      .insert({
-        from_id: params.id,
-        channel_id: params.channelId,
-        message: params.message,
-      })
-      .then(() => {
-        return knex("channel_messages")
-          .where({
-            from_id: knex
-              .from("channel_messages")
-              .innerJoin("users", "id", params.id),
-            channel_id: knex("channels")
-              .select("*")
-              .where("id", params.channelId),
-            message: params.message,
-          })
-          .select();
-      })
-      .then((messageObj) => {
-        console.log(new channelMessage(messageObj[0]));
-        return new channelMessage(messageObj[0]);
-      });
-  });
-
-//knex.select("*").from("users").where('id', params.fromId)
+  Promise.resolve(params)
+    .then((params) => {
+      return knex("channel_messages")
+        .insert({
+          from_id: params.id,
+          channel_id: params.channelId,
+          message: params.message,
+        })
+        .then(() => {
+          return knex
+            .select(
+              "channel_messages.id",
+              "channels.name as to",
+              "users.username as from",
+              "channel_messages.message",
+              "channel_messages.sent_at"
+            )
+            .from("channel_messages")
+            .join("channels", "channel_messages.channel_id", "channels.id")
+            .join("users", "users.id", "=", "channel_messages.id");
+        });
+    })
+    .then((messageObj) => {
+      const returnedObj = new channelMessage(messageObj[0]);
+      console.log(returnedObj);
+      return [returnedObj];
+    });
