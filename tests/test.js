@@ -174,7 +174,7 @@ describe("channel_messages", () => {
       .then(() => knex("users").del())
   );
 
-  describe.only("#create", () => {
+  describe("create", () => {
     after(() => knex("channel_messages").del());
 
     it("creates a message", () =>
